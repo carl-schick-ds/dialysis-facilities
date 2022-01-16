@@ -2,6 +2,8 @@
 import pandas as pd
 
 def raw_analysis(raw_facilities_df):
+    # Perform some initial analysis on the raw data (unique values, value counts, etc.)
+    # This function helped prep for the validity of further processing.  It does not need to be executed as part of the data collection.
     raw_facilities_df.info()
     print(raw_facilities_df['Measure'].nunique())
     print(raw_facilities_df['Measure ID'].nunique())
@@ -14,6 +16,7 @@ def raw_analysis(raw_facilities_df):
     raw_facilities_df[raw_facilities_df['CCN'] == 332770]
 
 def get_facilities(raw_facilities_df):
+    # Extract the facility specicific data.  We compare counts to ensure the data was, indeed, duplicated across CCNs.
     facility_cols = ['State', 'CCN', 'Provider Name', 'City', 'Ownership Type', 'ESRD Network', 'NPI', 'Chain Name', 'Modality', 'Alternate CCN(s)']
     facilities_df = raw_facilities_df.drop_duplicates(subset=facility_cols)[facility_cols].set_index('CCN')
 
@@ -23,6 +26,7 @@ def get_facilities(raw_facilities_df):
     return facilities_df
 
 def get_measures(raw_facilities_df):
+    # Extract the measure specicific data.  We compare counts to ensure the data was, indeed, duplicated across Measure ID.
     measure_cols = ['Measure', 'Measure ID']
     measures_df = raw_facilities_df.drop_duplicates(subset=measure_cols)[measure_cols].set_index('Measure ID')
 
@@ -42,9 +46,9 @@ def get_measures(raw_facilities_df):
     return measures_df
 
 def get_scores(raw_facilities_df):
-    # display(raw_facilities_df['Year(s) covered by the measure'].value_counts())
+    # Rename the Years column to a short string, and then extract the scores data.  We compare counts to ensure we've grabbed everything.
     raw_facilities_df.rename(columns={'Year(s) covered by the measure' : 'Year'}, inplace=True)
-    fac_scores_df = raw_facilities_df[['CCN', 'Measure ID', 'Year', 'Measure Score']]
+    fac_scores_df = raw_facilities_df[['CCN', 'Measure ID', 'Year', 'Measure Score']].set_index(['CCN', 'Measure ID'])
 
     print('Raw Scores:', raw_facilities_df.shape[0])
     print('Extracted Scores:', fac_scores_df.shape[0])
