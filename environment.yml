@@ -1,4 +1,4 @@
-name: dia-fac
+name: pj-diafac
 channels:
   - defaults
 dependencies:
